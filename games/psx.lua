@@ -34,8 +34,8 @@ getgenv().kocmoc = {
 
 --/--/--/--/--/--/--/ variables --/--/--/--/--/--/--/
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Boxking776/kocmoc/main/library.lua"))()
-local api = loadstring(game:HttpGet("https://raw.githubusercontent.com/Boxking776/kocmoc/main/api.lua"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/library.lua"))()
+local api = loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/api.lua"))()
 local defaultkocmoc = kocmoc
 local WinConfig = { WindowName = "Kocmoc v"..temptable.version.." | Pet Simulator X", Color = Color3.fromRGB(164, 84, 255), Keybind = Enum.KeyCode.Semicolon}
 local Window = library:CreateWindow(WinConfig, game:GetService("CoreGui"))
