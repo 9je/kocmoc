@@ -25,6 +25,7 @@ local done = true
 local hi = false
 local Items = require(game:GetService("ReplicatedStorage").EggTypes).GetTypes()
 local v1 = require(game.ReplicatedStorage.ClientStatCache):Get();
+local microconverterused = false
 
 hives = game.Workspace.Honeycombs:GetChildren() for i = #hives, 1, -1 do  v = game.Workspace.Honeycombs:GetChildren()[i] if v.Owner.Value == nil then game.ReplicatedStorage.Events.ClaimHive:FireServer(v.HiveID.Value) end end
 
@@ -38,7 +39,7 @@ for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
     end
 end
 getgenv().temptable = {
-    version = "3.2.9",
+    version = "3.2.11",
     blackfield = "Sunflower Field",
     redfields = {},
     bluefields = {},
@@ -254,6 +255,7 @@ getgenv().kocmoc = {
     bltokens = {},
     toggles = {
         autofarm = false,
+        automicro = false,
         farmclosestleaf = false,
         farmbubbles = false,
         autodig = false,
@@ -890,7 +892,7 @@ information:CreateLabel("Place version: "..game.PlaceVersion)
 information:CreateLabel("⚠️ - Not Safe Function")
 information:CreateLabel("⚙ - Configurable Function")
 information:CreateLabel("📜 - May be exploit specific")
-information:CreateLabel("Remix by 9je")
+information:CreateLabel("Update by 9je") --Added to remove duplicated place in previous version, remove if you want
 information:CreateLabel("Script by Boxking776")
 information:CreateLabel("Originally by weuz_ and mrdevl")
 local gainedhoneylabel = information:CreateLabel("Gained Honey: 0")
@@ -912,10 +914,10 @@ farmo:CreateDropdown("Autodig Mode", {"Normal","Collector Steal"}, function(Opti
 
 local contt = farmtab:CreateSection("Container Tools")
 contt:CreateToggle("Don't Convert Pollen", nil, function(State) kocmoc.toggles.disableconversion = State end)
+farmo:CreateToggle("Auto Micro-Converter", nil, function(State) kocmoc.toggles.automicro = State end):AddToolTip("Will automatically use Micro-Converter at 100% capacity") --may move to different section
 contt:CreateToggle("Auto Bag Reduction",nil,function(Boole) kocmoc.toggles.autouseconvertors = Boole end)
 contt:CreateDropdown("Bag Reduction Mode",{"Ticket Converters","Just Snowflakes","Just Coconuts","Snowflakes and Coconuts","Tickets and Snowflakes","Tickets and Coconuts","All"},function(Select) kocmoc.vars.autouseMode = Select end)
 contt:CreateSlider("Reduction Confirmation Time",3,20,10,false,function(tttttttt) kocmoc.vars.autoconvertWaitTime = tonumber(tttttttt) end)
-
 farmo:CreateToggle("Auto Sprinkler", nil, function(State) kocmoc.toggles.autosprinkler = State end)
 farmo:CreateToggle("Farm Bubbles", nil, function(State) kocmoc.toggles.farmbubbles = State end)
 farmo:CreateToggle("Farm Flames", nil, function(State) kocmoc.toggles.farmflame = State end)
@@ -1472,8 +1474,18 @@ task.spawn(function() while task.wait() do
                 fieldposition = fieldpos.Position
             end
         end
+
+        if GetItemListWithValue()["Micro-Converter"] > 0 and kocmoc.toggles.automicro then --Checking if you have micros/enabled auto micro
+            
+            if tonumber(pollenpercentage) >= tonumber(kocmoc.vars.convertat) and microconverterused == false then
+                game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Micro-Converter"})
+                local microconverterused = true
+            elseif tonumber(pollenpercentage) == 0 and microconverterused == true then
+                local microconverterused = false
+            end
+        end
         
-        if (tonumber(pollenpercentage) < tonumber(kocmoc.vars.convertat)) or (kocmoc.toggles.disableconversion == true) then
+        if (tonumber(pollenpercentage) < tonumber(kocmoc.vars.convertat)) or (kocmoc.toggles.disableconversion == true) or (kocmoc.toggles.automicro == true) then
             if not temptable.tokensfarm then
                 api.tween(2, fieldpos)
                 task.wait(2)
@@ -1515,7 +1527,7 @@ task.spawn(function() while task.wait() do
                 if not kocmoc.toggles.farmflower then getflower() end
             end
         elseif tonumber(pollenpercentage) >= tonumber(kocmoc.vars.convertat) then
-            if not kocmoc.toggles.disableconversion then
+            if not kocmoc.toggles.disableconversion or kocmoc.toggles.automicro then
             temptable.tokensfarm = false
             api.tween(2, game:GetService("Players").LocalPlayer.SpawnPos.Value * CFrame.fromEulerAnglesXYZ(0, 110, 0) + Vector3.new(0, 0, 9))
             task.wait(2)
