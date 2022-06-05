@@ -39,7 +39,7 @@ for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
     end
 end
 getgenv().temptable = {
-    version = "3.2.11",
+    version = "3.2.12",
     blackfield = "Sunflower Field",
     redfields = {},
     bluefields = {},
@@ -122,6 +122,7 @@ getgenv().temptable = {
     coconut = false,
     act = 0,
     act2 = 0,
+    act3 = 0,
     ['touchedfunction'] = function(v)
         if lasttouched ~= v then
             if v.Parent.Name == "FlowerZones" then
@@ -320,6 +321,7 @@ getgenv().kocmoc = {
         npcprefer = "All Quests",
         farmtype = "Walk",
         monstertimer = 3,
+        balloontimer = 1,
         autodigmode = "Normal",
         donoItem = "Coconut",
         donoAmount = 25,
@@ -914,7 +916,7 @@ farmo:CreateDropdown("Autodig Mode", {"Normal","Collector Steal"}, function(Opti
 
 local contt = farmtab:CreateSection("Container Tools")
 contt:CreateToggle("Don't Convert Pollen", nil, function(State) kocmoc.toggles.disableconversion = State end)
-farmo:CreateToggle("Auto Micro-Converter", nil, function(State) kocmoc.toggles.automicro = State end):AddToolTip("Will automatically use Micro-Converter at 100% capacity") --may move to different section
+contt:CreateToggle("Auto Micro-Converter", nil, function(State) kocmoc.toggles.automicro = State end):AddToolTip("Will automatically use Micro-Converter at 100% capacity") --may move to different section
 contt:CreateToggle("Auto Bag Reduction",nil,function(Boole) kocmoc.toggles.autouseconvertors = Boole end)
 contt:CreateDropdown("Bag Reduction Mode",{"Ticket Converters","Just Snowflakes","Just Coconuts","Snowflakes and Coconuts","Tickets and Snowflakes","Tickets and Coconuts","All"},function(Select) kocmoc.vars.autouseMode = Select end)
 contt:CreateSlider("Reduction Confirmation Time",3,20,10,false,function(tttttttt) kocmoc.vars.autoconvertWaitTime = tonumber(tttttttt) end)
@@ -964,7 +966,6 @@ mobkill:CreateToggle("Train Snail", nil, function(State) fd = game.Workspace.Flo
 mobkill:CreateToggle("Kill Mondo", nil, function(State) kocmoc.toggles.killmondo = State end)
 mobkill:CreateToggle("Kill Vicious", nil, function(State) kocmoc.toggles.killvicious = State end)
 mobkill:CreateToggle("Kill Windy", nil, function(State) kocmoc.toggles.killwindy = State end)
-mobkill:CreateToggle("Auto Kill Mobs", nil, function(State) kocmoc.toggles.autokillmobs = State end):AddToolTip("Kills mobs after x pollen converting")
 mobkill:CreateToggle("Avoid Mobs", nil, function(State) kocmoc.toggles.avoidmobs = State end)
 mobkill:CreateToggle("Auto Ant", nil, function(State) kocmoc.toggles.autoant = State end):AddToolTip("Must equip spark staff 😋; Goes to Ant Challenge after pollen converting")
 
@@ -974,7 +975,8 @@ serverhopkill:CreateLabel("")
 serverhopkill:CreateLabel("[⚠️] These functions will unload the UI")
 serverhopkill:CreateLabel("")
 
-local amks = combtab:CreateSection("Auto Kill Mobs Settings")
+local amks = combtab:CreateSection("Mob Auto Kill")
+mobkill:CreateToggle("Auto Kill Mobs", nil, function(State) kocmoc.toggles.autokillmobs = State end):AddToolTip("Kills mobs after x pollen converting")
 amks:CreateTextBox('Kill Mobs After x Convertions', 'default = 3', true, function(Value) kocmoc.vars.monstertimer = tonumber(Value) end)
 
 
@@ -1262,6 +1264,7 @@ farmsettings:CreateTextBox("Autofarming Walkspeed", "Default Value = 60", true, 
 farmsettings:CreateToggle("^ Loop Speed On Autofarming",nil, function(State) kocmoc.toggles.loopfarmspeed = State end)
 farmsettings:CreateToggle("Don't Walk In Field",nil, function(State) kocmoc.toggles.farmflower = State end)
 farmsettings:CreateToggle("Convert Hive Balloon",nil, function(State) kocmoc.toggles.convertballoons = State end)
+farmsettings:CreateTextBox('Convert Balloon after x Convertions', 'default = 1', true, function(Value) kocmoc.vars.balloontimer = tonumber(Value) end)
 farmsettings:CreateToggle("Don't Farm Tokens",nil, function(State) kocmoc.toggles.donotfarmtokens = State end)
 farmsettings:CreateToggle("Enable Token Blacklisting",nil, function(State) kocmoc.toggles.enabletokenblacklisting = State end)
 farmsettings:CreateSlider("Walk Speed", 0, 120, 70, false, function(Value) kocmoc.vars.walkspeed = Value end)
@@ -1478,8 +1481,8 @@ task.spawn(function() while task.wait() do
         if GetItemListWithValue()["Micro-Converter"] > 0 and kocmoc.toggles.automicro then --Checking if you have micros/enabled auto micro
             
             if tonumber(pollenpercentage) >= tonumber(kocmoc.vars.convertat) and microconverterused == false then
-                game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Micro-Converter"})
                 local microconverterused = true
+                game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Micro-Converter"})
             elseif tonumber(pollenpercentage) == 0 and microconverterused == true then
                 local microconverterused = false
             end
@@ -1536,14 +1539,20 @@ task.spawn(function() while task.wait() do
                 converthoney()
             until game.Players.LocalPlayer.CoreStats.Pollen.Value == 0
             if kocmoc.toggles.convertballoons and gethiveballoon() then
-                task.wait(6)
+                if temptable.act3 >= kocmoc.vars.balloontimer then
+                    task.wait(6)
                 repeat
                     task.wait()
                     converthoney()
                 until gethiveballoon() == false or not kocmoc.toggles.convertballoons
+                temptable.act3 = 0
+                end
             end
+                
             temptable.converting = false
             temptable.act = temptable.act + 1
+            temptable.act2 = temptable.act2 + 1
+            temptable.act3 = temptable.act3 + 1
             task.wait(6)
             if kocmoc.toggles.autoant and not game:GetService("Workspace").Toys["Ant Challenge"].Busy.Value and rtsg().Eggs.AntPass > 0 then farmant() end
             if kocmoc.toggles.autoquest then makequests() end
