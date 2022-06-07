@@ -4,14 +4,16 @@ getgenv().Star = "⭐"
 getgenv().Danger = "⚠️"
 getgenv().ExploitSpecific = "📜"
 
--- API CALLS
+--Cred : Iris
+loadstring(game:HttpGet("https://irisapp.ca/api/Scripts/IrisBetterCompat.lua")) --Just make it a little easier to use request and other stuff
 
+-- API CALLS
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/library.lua"))()
 getgenv().api = loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/api.lua"))()
 local bssapi = loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/bssapi.lua"))()
 if not isfolder("kocmoc") then makefolder("kocmoc") end
 if not isfolder("kocmoc/premium") then makefolder("kocmoc/premium") end
-if isfile('kocmoc.txt') == false then (syn and syn.request or http_request or request)({ Url = "http://127.0.0.1:6463/rpc?v=1",Method = "POST",Headers = {["Content-Type"] = "application/json",["Origin"] = "https://discord.com"},Body = game:GetService("HttpService"):JSONEncode({cmd = "INVITE_BROWSER",args = {code = "kTNMzbxUuZ"},nonce = game:GetService("HttpService"):GenerateGUID(false)}),writefile('kocmoc.txt', "discord")})end
+if isfile('kocmoc.txt') == false then syn.request({ Url = "http://127.0.0.1:6463/rpc?v=1",Method = "POST",Headers = {["Content-Type"] = "application/json",["Origin"] = "https://discord.com"},Body = game:GetService("HttpService"):JSONEncode({cmd = "INVITE_BROWSER",args = {code = "kTNMzbxUuZ"},nonce = game:GetService("HttpService"):GenerateGUID(false)}),writefile('kocmoc.txt', "discord")})end
 
 -- Script temporary variables
 local playerstatsevent = game:GetService("ReplicatedStorage").Events.RetrievePlayerStats
