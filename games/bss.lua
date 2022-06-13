@@ -917,7 +917,7 @@ farmo:CreateDropdown("Autodig Mode", {"Normal","Collector Steal"}, function(Opti
 
 local contt = farmtab:CreateSection("Container Tools")
 contt:CreateToggle("Don't Convert Pollen", nil, function(State) kocmoc.toggles.disableconversion = State end)
-contt:CreateToggle("Auto Micro-Converter", nil, function(State) kocmoc.toggles.automicro = State end):AddToolTip("Will automatically use Micro-Converter at 100% capacity") --may move to different section
+contt:CreateToggle("Auto Micro-Converter", nil, function(State) kocmoc.toggles.automicro = State end):AddToolTip("Will automatically use Micro-Converter at 100% capacity")
 contt:CreateToggle("Auto Bag Reduction",nil,function(Boole) kocmoc.toggles.autouseconvertors = Boole end)
 contt:CreateDropdown("Bag Reduction Mode",{"Ticket Converters","Just Snowflakes","Just Coconuts","Snowflakes and Coconuts","Tickets and Snowflakes","Tickets and Coconuts","All"},function(Select) kocmoc.vars.autouseMode = Select end)
 contt:CreateSlider("Reduction Confirmation Time",3,20,10,false,function(tttttttt) kocmoc.vars.autoconvertWaitTime = tonumber(tttttttt) end)
@@ -957,6 +957,7 @@ farmt:CreateToggle("Teleport To Rares [⚠️]", nil, function(State) kocmoc.tog
 farmt:CreateToggle("Auto Accept/Confirm Quests [⚙]", nil, function(State) kocmoc.toggles.autoquest = State end)
 farmt:CreateToggle("Auto Do Quests [⚙]", nil, function(State) kocmoc.toggles.autodoquest = State end)
 farmt:CreateToggle("Auto Honeystorm", nil, function(State) kocmoc.toggles.honeystorm = State end)
+farmt:CreateToggle("Auto Meteor Shower", nil, function(State) kocmoc.toggles.meteorshower = State end)
 farmt:CreateLabel(" ")
 farmt:CreateToggle("Reset Bee Energy after X Conversions",nil,function(bool) kocmoc.vars.resetbeeenergy = bool end)
 farmt:CreateTextBox("Conversion Amount", "default = 3", true, function(Value) kocmoc.vars.resettimer = tonumber(Value) end)
@@ -1314,6 +1315,7 @@ kocmocs:CreateTextBox("Config Name", 'ex: stumpconfig', false, function(Value) t
 kocmocs:CreateButton("Load Config", function() kocmoc = game:service'HttpService':JSONDecode(readfile("kocmoc/BSS_"..temptable.configname..".json")) end)
 kocmocs:CreateButton("Save Config", function() writefile("kocmoc/BSS_"..temptable.configname..".json",game:service'HttpService':JSONEncode(kocmoc)) end)
 kocmocs:CreateButton("Reset Config", function() kocmoc = defaultkocmoc end)
+kocmocs:CreateButton("Overwrite Default Config", function() writefile("kocmoc/BSS_autoexec.json",game:service'HttpService':JSONEncode(kocmoc)) end):AddToolTip("Current config will be saved as BSS_autoexec.json and will be loaded automatically upon next execution")
 local fieldsettings = setttab:CreateSection("Fields Settings")
 fieldsettings:CreateDropdown("Best White Field", temptable.whitefields, function(Option) kocmoc.bestfields.white = Option end)
 fieldsettings:CreateDropdown("Best Red Field", temptable.redfields, function(Option) kocmoc.bestfields.red = Option end)
@@ -1787,6 +1789,7 @@ task.spawn(function() while task.wait(1) do
     temptable.runningfor = temptable.runningfor + 1
     temptable.honeycurrent = statsget().Totals.Honey
     if kocmoc.toggles.honeystorm then game.ReplicatedStorage.Events.ToyEvent:FireServer("Honeystorm") end
+    if kocmoc.toggles.meteorshower then game.ReplicatedStorage.Events.ToyEvent:FireServer("Mythic Meteor Shower") end
     if kocmoc.toggles.collectgingerbreads then game:GetService("ReplicatedStorage").Events.ToyEvent:FireServer("Gingerbread House") end
     if kocmoc.toggles.autodispense then
         if kocmoc.dispensesettings.rj then local A_1 = "Free Royal Jelly Dispenser" local Event = game:GetService("ReplicatedStorage").Events.ToyEvent Event:FireServer(A_1) end
@@ -2053,6 +2056,8 @@ task.spawn(function()
     end
     end)
 end)
+
+_G.autoload = "autoexec"
 
 if _G.autoload then if isfile("kocmoc/BSS_".._G.autoload..".json") then kocmoc = game:service'HttpService':JSONDecode(readfile("kocmoc/BSS_".._G.autoload..".json")) end end
 for _, part in next, workspace:FindFirstChild("FieldDecos"):GetDescendants() do if part:IsA("BasePart") then part.CanCollide = false part.Transparency = part.Transparency < 0.5 and 0.5 or part.Transparency task.wait() end end
