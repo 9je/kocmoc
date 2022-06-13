@@ -39,7 +39,7 @@ for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
     end
 end
 getgenv().temptable = {
-    version = "3.2.12",
+    version = "3.3.0",
     blackfield = "Sunflower Field",
     redfields = {},
     bluefields = {},
@@ -302,6 +302,7 @@ getgenv().kocmoc = {
         autoplanters = false,
         autokillmobs = false,
         autoant = false,
+        autousestinger = false,
         killwindy = false,
         godmode = false,
         disableconversion = false,
@@ -968,6 +969,7 @@ mobkill:CreateToggle("Kill Vicious", nil, function(State) kocmoc.toggles.killvic
 mobkill:CreateToggle("Kill Windy", nil, function(State) kocmoc.toggles.killwindy = State end)
 mobkill:CreateToggle("Avoid Mobs", nil, function(State) kocmoc.toggles.avoidmobs = State end)
 mobkill:CreateToggle("Auto Ant", nil, function(State) kocmoc.toggles.autoant = State end):AddToolTip("Must equip spark staff 😋; Goes to Ant Challenge after pollen converting")
+mobkill:CreateToggle("Auto Use Stinger", nil, function(State) kocmoc.toggles.autousestinger = State end):AddToolTip("Uses 1 Stinger every 30 sec")
 
 local serverhopkill = combtab:CreateSection("Serverhopping Combat")
 serverhopkill:CreateButton("Vicious Bee Serverhopper [⚠️][📜]",function() loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/functions/viciousbeeserverhop.lua"))() end):AddToolTip("Serverhops for rouge vicious bees")
@@ -1583,6 +1585,15 @@ task.spawn(function() while task.wait() do
         end
     end
 end end end end)
+
+task.spawn(function()
+    while task.wait(1) do
+        if kocmoc.toggles.autousestinger then
+            game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Stinger"})
+            task.wait(30)
+        end
+    end
+end)
 
 task.spawn(function()
     while task.wait(1) do
