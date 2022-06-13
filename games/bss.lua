@@ -303,6 +303,7 @@ getgenv().kocmoc = {
         autokillmobs = false,
         autoant = false,
         autousestinger = false,
+        autosprout,
         killwindy = false,
         godmode = false,
         disableconversion = false,
@@ -950,7 +951,7 @@ farmt:CreateToggle("Auto Planters", nil, function(State) kocmoc.toggles.autoplan
 -- BEESMAS MARKER farmt:CreateToggle("Auto Beesmas Feast", nil, function(State) kocmoc.toggles.autofeast = State end)
 -- BEESMAS MARKER farmt:CreateToggle("Auto Onett's Lid Art", nil, function(State) kocmoc.toggles.autoonettart = State end)
 farmt:CreateToggle("Auto Free Antpasses", nil, function(State) kocmoc.toggles.freeantpass = State end)
-farmt:CreateToggle("Farm Sprouts", nil, function(State) kocmoc.toggles.farmsprouts = State end)
+farmt:CreateToggle("Farm Sprouts", nil, function(State) kocmoc.toggles.farmsprouts = State end):AddToolTip("Will automatically place sprouts where player is standing")
 farmt:CreateToggle("Farm Puffshrooms", nil, function(State) kocmoc.toggles.farmpuffshrooms = State end)
 -- BEESMAS MARKER farmt:CreateToggle("Farm Snowflakes [⚠️]", nil, function(State) kocmoc.toggles.farmsnowflakes = State end)
 farmt:CreateToggle("Teleport To Rares [⚠️]", nil, function(State) kocmoc.toggles.farmrares = State end)
@@ -972,11 +973,11 @@ mobkill:CreateToggle("Avoid Mobs", nil, function(State) kocmoc.toggles.avoidmobs
 mobkill:CreateToggle("Auto Ant", nil, function(State) kocmoc.toggles.autoant = State end):AddToolTip("Must equip spark staff 😋; Goes to Ant Challenge after pollen converting")
 mobkill:CreateToggle("Auto Use Stinger", nil, function(State) kocmoc.toggles.autousestinger = State end):AddToolTip("Uses 1 Stinger every 30 sec")
 
-local serverhopkill = combtab:CreateSection("Serverhopping Combat")
+--[[ local serverhopkill = combtab:CreateSection("Serverhopping Combat")
 serverhopkill:CreateButton("Vicious Bee Serverhopper [⚠️][📜]",function() loadstring(game:HttpGet("https://raw.githubusercontent.com/9je/kocmoc/main/functions/viciousbeeserverhop.lua"))() end):AddToolTip("Serverhops for rouge vicious bees")
 serverhopkill:CreateLabel("")
-serverhopkill:CreateLabel("[⚠️] These functions will unload the UI")
-serverhopkill:CreateLabel("")
+serverhopkill:CreateLabel("[⚠️] These functions will unload the UI") --rip for now
+serverhopkill:CreateLabel("") ]]
 
 local amks = combtab:CreateSection("Mob Auto Kill")
 mobkill:CreateToggle("Auto Kill Mobs", nil, function(State) kocmoc.toggles.autokillmobs = State end):AddToolTip("Kills mobs after x pollen converting")
@@ -991,6 +992,8 @@ wayp:CreateButton("Teleport to hive", function() game.Players.LocalPlayer.Charac
 
 local useitems = itemstab:CreateSection("Use Items")
 
+useitems:CreateToggle("Auto Place Sprout", nil, function(State) kocmoc.toggles.autosprout = State end)
+useitems:CreateLabel("")
 useitems:CreateButton("Use All Buffs [⚠️]",function() for i,v in pairs(buffTable) do  game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"]=i}) end end)
 useitems:CreateLabel("")
 
@@ -1590,9 +1593,18 @@ end end end end)
 
 task.spawn(function()
     while task.wait(1) do
-        if kocmoc.toggles.autousestinger then
+        if GetItemListWithValue()["Stinger"] > 0 and kocmoc.toggles.autousestinger then
             game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Stinger"})
             task.wait(30)
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        if GetItemListWithValue()["Magic Bean"] > 0 and kocmoc.toggles.autosprout then
+            game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Magic Bean"})
+            task.wait(1)
         end
     end
 end)
