@@ -1502,7 +1502,7 @@ task.spawn(function() while task.wait() do
             end
         end
         
-        if (tonumber(pollenpercentage) < tonumber(kocmoc.vars.convertat)) or (kocmoc.toggles.disableconversion == true) or (outOfMicro == false) then
+        if (tonumber(pollenpercentage) < tonumber(kocmoc.vars.convertat)) or (kocmoc.toggles.disableconversion == true) or (outOfMicro == true) then
             if not temptable.tokensfarm then
                 api.tween(2, fieldpos)
                 task.wait(2)
@@ -1544,7 +1544,7 @@ task.spawn(function() while task.wait() do
                 if not kocmoc.toggles.farmflower then getflower() end
             end
         elseif tonumber(pollenpercentage) >= tonumber(kocmoc.vars.convertat) then
-            if not kocmoc.toggles.disableconversion or not outOfMicro then
+            if (kocmoc.toggles.disableconversion == false) or (kocmoc.toggles.automicro == false) or (kocmoc.toggles.automicro and outOfMicro) then
             temptable.tokensfarm = false
             api.tween(2, game:GetService("Players").LocalPlayer.SpawnPos.Value * CFrame.fromEulerAnglesXYZ(0, 110, 0) + Vector3.new(0, 0, 9))
             task.wait(2)
