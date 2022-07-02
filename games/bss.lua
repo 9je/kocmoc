@@ -39,7 +39,7 @@ for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
     end
 end
 getgenv().temptable = {
-    version = "3.3.0",
+    version = "3.3.1",
     blackfield = "Sunflower Field",
     redfields = {},
     bluefields = {},
@@ -303,7 +303,6 @@ getgenv().kocmoc = {
         autokillmobs = false,
         autoant = false,
         autousestinger = false,
-        autosprout,
         killwindy = false,
         godmode = false,
         disableconversion = false,
@@ -920,7 +919,7 @@ local contt = farmtab:CreateSection("Container Tools")
 contt:CreateToggle("Don't Convert Pollen", nil, function(State) kocmoc.toggles.disableconversion = State end)
 contt:CreateToggle("Auto Micro-Converter", nil, function(State) kocmoc.toggles.automicro = State end):AddToolTip("Will automatically use Micro-Converter at 100% capacity")
 contt:CreateToggle("Auto Bag Reduction",nil,function(Boole) kocmoc.toggles.autouseconvertors = Boole end)
-contt:CreateDropdown("Bag Reduction Mode",{"Ticket Converters","Just Snowflakes","Just Coconuts","Snowflakes and Coconuts","Tickets and Snowflakes","Tickets and Coconuts","All"},function(Select) kocmoc.vars.autouseMode = Select end)
+contt:CreateDropdown("Bag Reduction Mode",{"Ticket Converters","Just Coconuts","Tickets and Coconuts"},function(Select) kocmoc.vars.autouseMode = Select end)
 contt:CreateSlider("Reduction Confirmation Time",3,20,10,false,function(tttttttt) kocmoc.vars.autoconvertWaitTime = tonumber(tttttttt) end)
 farmo:CreateToggle("Auto Sprinkler", nil, function(State) kocmoc.toggles.autosprinkler = State end)
 farmo:CreateToggle("Farm Bubbles", nil, function(State) kocmoc.toggles.farmbubbles = State end)
@@ -930,6 +929,7 @@ farmo:CreateToggle("Farm Precise Crosshairs", nil, function(State) kocmoc.toggle
 farmo:CreateToggle("Farm Fuzzy Bombs", nil, function(State) kocmoc.toggles.farmfuzzy = State end)
 farmo:CreateToggle("Farm Under Balloons", nil, function(State) kocmoc.toggles.farmunderballoons = State end)
 farmo:CreateToggle("Farm Under Clouds", nil, function(State) kocmoc.toggles.farmclouds = State end)
+farmo:CreateToggle("Farm Closest Leaves", nil, function(State) kocmoc.toggles.farmclosestleaf = State end)
 farmo:CreateLabel("")
 farmo:CreateToggle("Auto Honey Mask",nil,function(bool)
     kocmoc.toggles.honeymaskconv = bool
@@ -937,7 +937,6 @@ end)
 farmo:CreateDropdown("Default Mask",MasksTable,function(val)
     kocmoc.vars.defmask = val
 end)
---farmo:CreateToggle("Farm Closest Leaves", nil, function(State) kocmoc.toggles.farmclosestleaf = State end)
 
 local farmt = farmtab:CreateSection("Farming")
 farmt:CreateToggle("Auto Dispenser [⚙]", nil, function(State) kocmoc.toggles.autodispense = State end)
@@ -992,8 +991,6 @@ wayp:CreateButton("Teleport to hive", function() game.Players.LocalPlayer.Charac
 
 local useitems = itemstab:CreateSection("Use Items")
 
-useitems:CreateToggle("Auto Place Sprout", nil, function(State) kocmoc.toggles.autosprout = State end)
-useitems:CreateLabel("")
 useitems:CreateButton("Use All Buffs [⚠️]",function() for i,v in pairs(buffTable) do  game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"]=i}) end end)
 useitems:CreateLabel("")
 
@@ -1270,13 +1267,13 @@ farmsettings:CreateTextBox("Autofarming Walkspeed", "Default Value = 60", true, 
 farmsettings:CreateToggle("^ Loop Speed On Autofarming",nil, function(State) kocmoc.toggles.loopfarmspeed = State end)
 farmsettings:CreateToggle("Don't Walk In Field",nil, function(State) kocmoc.toggles.farmflower = State end)
 farmsettings:CreateToggle("Convert Hive Balloon",nil, function(State) kocmoc.toggles.convertballoons = State end)
-farmsettings:CreateTextBox('Convert Balloon after x Convertions', 'default = 1', true, function(Value) kocmoc.vars.balloontimer = tonumber(Value) end)
+farmsettings:CreateTextBox('Convert Balloon after x Convertions', 'default = 1', true, function(Value) kocmoc.vars.balloontimer = tonumber(Value) end):AddToolTip("Must enable convert hive balloon")
 farmsettings:CreateToggle("Don't Farm Tokens",nil, function(State) kocmoc.toggles.donotfarmtokens = State end)
 farmsettings:CreateToggle("Enable Token Blacklisting",nil, function(State) kocmoc.toggles.enabletokenblacklisting = State end)
 farmsettings:CreateSlider("Walk Speed", 0, 120, 70, false, function(Value) kocmoc.vars.walkspeed = Value end)
 farmsettings:CreateSlider("Jump Power", 0, 120, 70, false, function(Value) kocmoc.vars.jumppower = Value end)
 local raresettings = setttab:CreateSection("Tokens Settings")
-raresettings:CreateTextBox("Asset ID", 'rbxassetid', false, function(Value) rarename = Value end)
+raresettings:CreateTextBox("Asset ID", 'rbxassetid', false, function(Value) rarename = Value end):AddToolTip("You can find BSS asset IDs in the #rare-ids channel of the discord")
 raresettings:CreateButton("Add Token To Rares List", function()
     table.insert(kocmoc.rares, rarename)
     game:GetService("CoreGui"):FindFirstChild(_G.windowname).Main:FindFirstChild("Rares List D",true):Destroy()
@@ -1310,8 +1307,8 @@ dispsettings:CreateToggle("Mountain Top Booster", nil,  function(State) kocmoc.d
 dispsettings:CreateToggle("Blue Field Booster", nil,  function(State) kocmoc.dispensesettings.blue = not kocmoc.dispensesettings.blue end)
 dispsettings:CreateToggle("Red Field Booster", nil,  function(State) kocmoc.dispensesettings.red = not kocmoc.dispensesettings.red end)
 local guisettings = setttab:CreateSection("GUI Settings")
-local uitoggle = guisettings:CreateToggle("UI Toggle", nil, function(State) Window:Toggle(State) end) uitoggle:CreateKeybind(tostring(Config.Keybind):gsub("Enum.KeyCode.", ""), function(Key) Config.Keybind = Enum.KeyCode[Key] end) uitoggle:SetState(true)
-guisettings:CreateColorpicker("UI Color", function(Color) Window:ChangeColor(Color) end)
+local uitoggle = guisettings:CreateToggle("UI Visible", nil, function(State) Window:Toggle(State) end) uitoggle:CreateKeybind(tostring(Config.Keybind):gsub("Enum.KeyCode.", ""), function(Key) Config.Keybind = Enum.KeyCode[Key] end) uitoggle:SetState(true)
+guisettings:CreateColorpicker("UI Accent Color", function(Color) Window:ChangeColor(Color) end)
 local themes = guisettings:CreateDropdown("Image", {"Default","Hearts","Abstract","Hexagon","Circles","Lace With Flowers","Floral"}, function(Name) if Name == "Default" then Window:SetBackground("2151741365") elseif Name == "Hearts" then Window:SetBackground("6073763717") elseif Name == "Abstract" then Window:SetBackground("6073743871") elseif Name == "Hexagon" then Window:SetBackground("6073628839") elseif Name == "Circles" then Window:SetBackground("6071579801") elseif Name == "Lace With Flowers" then Window:SetBackground("6071575925") elseif Name == "Floral" then Window:SetBackground("5553946656") end end)themes:SetOption("Default")
 local kocmocs = setttab:CreateSection("Configs")
 kocmocs:CreateTextBox("Config Name", 'ex: stumpconfig', false, function(Value) temptable.configname = Value end)
@@ -1596,15 +1593,6 @@ task.spawn(function()
         if GetItemListWithValue()["Stinger"] > 0 and kocmoc.toggles.autousestinger then
             game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Stinger"})
             task.wait(30)
-        end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(1) do
-        if GetItemListWithValue()["Magic Bean"] > 0 and kocmoc.toggles.autosprout then
-            game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer({["Name"] = "Magic Bean"})
-            task.wait(1)
         end
     end
 end)
